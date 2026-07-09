@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Video</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --bg: #0B0E14;
+            --panel: #131A24;
+            --panel-border: #22303F;
+            --accent: #5EEAD4;
+            --accent-dim: #2C6D66;
+            --amber: #F5A623;
+            --text: #E7ECF3;
+            --muted: #7C8798;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        body {
+            background: var(--bg);
+            background-image:
+                radial-gradient(circle at 15% 10%, rgba(94, 234, 212, 0.06), transparent 40%),
+                radial-gradient(circle at 85% 90%, rgba(245, 166, 35, 0.05), transparent 40%);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 32px 20px;
+        }
+
+        .stage {
+            width: 100%;
+            max-width: 560px;
+        }
+
+        .eyebrow {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .eyebrow::before {
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 8px var(--accent);
+            animation: pulse 1.8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.35; }
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 34px;
+            line-height: 1.15;
+            margin: 0 0 8px;
+            letter-spacing: -0.01em;
+        }
+
+        .subhead {
+            color: var(--muted);
+            font-size: 15px;
+            margin: 0 0 32px;
+            max-width: 44ch;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--panel-border);
+            border-radius: 14px;
+            padding: 28px;
+        }
+
+        /* Viewfinder-style dropzone framing the file input, echoing object-detection bounding boxes */
+        .viewfinder {
+            position: relative;
+            border-radius: 10px;
+            padding: 40px 20px;
+            margin-bottom: 22px;
+            background: #0D1420;
+            transition: background 0.2s ease;
+        }
+
+        .viewfinder:focus-within,
+        .viewfinder:hover {
+            background: #0F1826;
+        }
+
+        .corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--accent);
+        }
+
+        .corner.tl { top: 8px; left: 8px; border-right: none; border-bottom: none; border-radius: 4px 0 0 0; }
+        .corner.tr { top: 8px; right: 8px; border-left: none; border-bottom: none; border-radius: 0 4px 0 0; }
+        .corner.bl { bottom: 8px; left: 8px; border-right: none; border-top: none; border-radius: 0 0 0 4px; }
+        .corner.br { bottom: 8px; right: 8px; border-left: none; border-top: none; border-radius: 0 0 4px 0; }
+
+        .viewfinder-label {
+            display: block;
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 14px;
+        }
+
+        /* Django's form.as_p renders unknown markup, so styling targets generic p/label/input */
+        form p {
+            margin: 0 0 16px;
+        }
+
+        form p:last-of-type {
+            margin-bottom: 0;
+        }
+
+        form label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        form input[type="file"],
+        form input[type="text"],
+        form input[type="number"] {
+            width: 100%;
+            background: var(--panel);
+            border: 1px dashed var(--panel-border);
+            border-radius: 8px;
+            padding: 12px 14px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+        }
+
+        form input[type="file"] {
+            cursor: pointer;
+        }
+
+        form input[type="file"]::file-selector-button {
+            background: var(--accent-dim);
+            color: var(--accent);
+            border: none;
+            border-radius: 6px;
+            padding: 8px 14px;
+            margin-right: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        form input[type="file"]::file-selector-button:hover {
+            background: var(--accent);
+            color: #05201C;
+        }
+
+        form input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            background: var(--accent);
+            color: #05201C;
+            border: none;
+            border-radius: 8px;
+            padding: 14px 20px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 0.01em;
+            cursor: pointer;
+            transition: transform 0.12s ease, background 0.15s ease;
+        }
+
+        button[type="submit"]:hover {
+            background: #7FF3DF;
+        }
+
+        button[type="submit"]:active {
+            transform: scale(0.98);
+        }
+
+        button[type="submit"]:focus-visible {
+            outline: 2px solid var(--amber);
+            outline-offset: 2px;
+        }
+
+        .foot-note {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--muted);
+            text-align: center;
+            margin-top: 18px;
+            letter-spacing: 0.04em;
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 27px; }
+            .panel { padding: 20px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .eyebrow::before { animation: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="stage">
+        <div class="eyebrow">Detection pipeline / step 1</div>
+        <h1>Upload your video</h1>
+        <p class="subhead">Drop a clip in and we'll scan every frame for shapes — circles, polygons, and everything in between.</p>
+
+        <div class="panel">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="viewfinder">
+                    <span class="corner tl"></span>
+                    <span class="corner tr"></span>
+                    <span class="corner bl"></span>
+                    <span class="corner br"></span>
+                    <span class="viewfinder-label">Target file</span>
+                    {{ form.as_p }}
+                </div>
+
+                <button type="submit">Upload and Detect Shapes</button>
+            </form>
+        </div>
+
+        <p class="foot-note">MP4 · MOV · AVI supported</p>
+    </div>
+</body>
+</html>

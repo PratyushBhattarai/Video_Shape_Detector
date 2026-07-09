@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Video Result</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --bg: #0B0E14;
+            --panel: #131A24;
+            --panel-border: #22303F;
+            --accent: #5EEAD4;
+            --accent-dim: #2C6D66;
+            --amber: #F5A623;
+            --red: #F0655A;
+            --text: #E7ECF3;
+            --muted: #7C8798;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body { margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            background-image:
+                radial-gradient(circle at 15% 10%, rgba(94, 234, 212, 0.06), transparent 40%),
+                radial-gradient(circle at 85% 90%, rgba(245, 166, 35, 0.05), transparent 40%);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            padding: 48px 20px;
+        }
+
+        .stage {
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+        .eyebrow {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .eyebrow::before {
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 8px var(--accent);
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 32px;
+            line-height: 1.15;
+            margin: 0 0 24px;
+            letter-spacing: -0.01em;
+            word-break: break-word;
+        }
+
+        .meta-panel {
+            background: var(--panel);
+            border: 1px solid var(--panel-border);
+            border-radius: 14px;
+            padding: 24px 28px;
+            margin-bottom: 28px;
+        }
+
+        .meta-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .meta-row + .meta-row {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid var(--panel-border);
+        }
+
+        .meta-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .meta-value {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 5px 12px;
+            border-radius: 999px;
+            border: 1px solid transparent;
+        }
+
+        .badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .badge.status-done {
+            color: var(--accent);
+            background: rgba(94, 234, 212, 0.1);
+            border-color: rgba(94, 234, 212, 0.3);
+        }
+        .badge.status-done::before { background: var(--accent); }
+
+        .badge.status-progress {
+            color: var(--amber);
+            background: rgba(245, 166, 35, 0.1);
+            border-color: rgba(245, 166, 35, 0.3);
+        }
+        .badge.status-progress::before {
+            background: var(--amber);
+            animation: pulse 1.4s ease-in-out infinite;
+        }
+
+        .badge.status-failed {
+            color: var(--red);
+            background: rgba(240, 101, 90, 0.1);
+            border-color: rgba(240, 101, 90, 0.3);
+        }
+        .badge.status-failed::before { background: var(--red); }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .notice {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            border-radius: 10px;
+            padding: 16px 18px;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 28px;
+        }
+
+        .notice.processing {
+            background: rgba(245, 166, 35, 0.08);
+            border: 1px solid rgba(245, 166, 35, 0.25);
+            color: #F0D9AE;
+        }
+
+        .notice.failed {
+            background: rgba(240, 101, 90, 0.08);
+            border: 1px solid rgba(240, 101, 90, 0.25);
+            color: #F5C4BF;
+        }
+
+        .notice p { margin: 0; }
+
+        .notice .icon {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 20px;
+            margin: 0 0 4px;
+        }
+
+        .section-sub {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--muted);
+            margin: 0 0 20px;
+        }
+
+        .shape-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 18px;
+        }
+
+        .shape-card {
+            position: relative;
+            background: var(--panel);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: border-color 0.15s ease, transform 0.15s ease;
+        }
+
+        .shape-card:hover {
+            border-color: var(--accent-dim);
+            transform: translateY(-2px);
+        }
+
+        .shape-frame {
+            position: relative;
+            background: #0D1420;
+        }
+
+        .shape-frame img {
+            display: block;
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+        }
+
+        .corner {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--accent);
+            opacity: 0.85;
+        }
+        .corner.tl { top: 6px; left: 6px; border-right: none; border-bottom: none; border-radius: 3px 0 0 0; }
+        .corner.tr { top: 6px; right: 6px; border-left: none; border-bottom: none; border-radius: 0 3px 0 0; }
+        .corner.bl { bottom: 6px; left: 6px; border-right: none; border-top: none; border-radius: 0 0 0 3px; }
+        .corner.br { bottom: 6px; right: 6px; border-left: none; border-top: none; border-radius: 0 0 3px 0; }
+
+        .shape-info {
+            padding: 12px 14px;
+        }
+
+        .shape-name {
+            font-weight: 600;
+            font-size: 14px;
+            margin: 0 0 2px;
+            text-transform: capitalize;
+        }
+
+        .shape-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--muted);
+            margin: 0;
+        }
+
+        .empty-state {
+            border: 1px dashed var(--panel-border);
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 25px; }
+            .meta-panel { padding: 20px; }
+            .meta-row { flex-direction: column; align-items: flex-start; gap: 6px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="stage">
+        <div class="eyebrow">Detection pipeline / result</div>
+        <h1>{{ video.original_name }}</h1>
+
+        <div class="meta-panel">
+            <div class="meta-row">
+                <span class="meta-label">Original file</span>
+                <span class="meta-value">{{ video.original_name }}</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-label">Status</span>
+                {% if video.status == 'failed' %}
+                    <span class="badge status-failed">{{ video.get_status_display }}</span>
+                {% elif video.status == 'processing' or video.status == 'queued' %}
+                    <span class="badge status-progress">{{ video.get_status_display }}</span>
+                {% else %}
+                    <span class="badge status-done">{{ video.get_status_display }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if video.status == 'processing' or video.status == 'queued' %}
+            <div class="notice processing">
+                <span class="icon">&gt;_</span>
+                <p>Please refresh after a short time. The worker is processing the video.</p>
+            </div>
+        {% endif %}
+
+        {% if video.status == 'failed' %}
+            <div class="notice failed">
+                <span class="icon">!</span>
+                <p>Error: {{ video.error_message }}</p>
+            </div>
+        {% endif %}
+
+        <h2>Detected shapes</h2>
+        <p class="section-sub">{{ video.shapes.all|length }} result(s)</p>
+
+        {% if video.shapes.all %}
+            <div class="shape-grid">
+                {% for shape in video.shapes.all %}
+                    <div class="shape-card">
+                        <div class="shape-frame">
+                            <span class="corner tl"></span>
+                            <span class="corner tr"></span>
+                            <span class="corner bl"></span>
+                            <span class="corner br"></span>
+                            <img src="{{ shape.snapshot.url }}" alt="{{ shape.shape_name }}">
+                        </div>
+                        <div class="shape-info">
+                            <p class="shape-name">{{ shape.shape_name }}</p>
+                            <p class="shape-time">second {{ shape.timestamp_seconds }}</p>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p>No shapes saved yet.</p>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">No shapes saved yet.</div>
+        {% endif %}
+    </div>
+</body>
+</html>
